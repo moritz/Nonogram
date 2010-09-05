@@ -60,13 +60,14 @@ method Str {
 method solve() {
     # trivial cases first
     $.solve-zero();
+    $.solve-one();
 }
 
 method solve-zero() {
-    for @.colspec.kv -> $k, $v {
-        if $v.elems == 0 {
+    for @.colspec.kv -> $idx, $col {
+        if $col.elems == 0 {
             for @!field-rows {
-                .[$k] = ' ';
+                .[$idx] = ' ';
             }
         }
     }
@@ -75,6 +76,20 @@ method solve-zero() {
             @!field-rows.[$idx][*] = ' ' xx *;
         }
     }
+}
+
+method solve-one() {
+    for @.colspec.kv -> $idx, $col {
+        next unless $col.elems == 1;
+        my $c = $col[0];
+        my $overlaps =  2 * $c - @.rowspec;
+        if $overlaps > 0 {
+            my $lower = @.rowspec - $c;
+            my $upper = $lower + $overlaps - 1;
+            @!field-rows[$_][$idx] = '#' for $lower..$upper;
+        }
+    }
+
 }
 
 # vim: ft=perl6
