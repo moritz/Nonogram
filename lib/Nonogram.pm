@@ -130,7 +130,7 @@ class Nonogram {
     }
 
     method solve-shift {
-        for <right down left up> -> $direction {
+        for <right down> -> $direction {
             my @spec = $direction eq (any <left right>) ?? @!rowspec !! @!colspec;
             for @spec.kv -> $idx, @chunks is copy {
                 next unless @chunks;
