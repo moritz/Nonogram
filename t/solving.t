@@ -13,23 +13,22 @@ my $n = Nonogram.new(
 
 lives_ok { $n.solve() }, 'can run .solve';
 
-# note: traling spaces here must be preserved!
 my $solved =
-q[       
- ?????? 
- ###### 
- ## ??? 
- ## ??? 
- ###### 
- ####   
- ##     
- ##     
- ?????? 
-        ];
+q[       |
+ ?????? |
+ ###### |
+ ## ??? |
+ ## ??? |
+ ###### |
+ ####   |
+ ##     |
+ ##     |
+ ?????? |
+        |];
 for $solved.split("\n").kv -> $j,  $line {
     my $i = 0;
     for $line.comb -> $c {
-        if $c ne '?' {
+        if $c eq none <? |> {
             is $n.field-rows[$j][$i], $c, "($j, $i) is '$c'";
         }
         $i++;
