@@ -155,6 +155,7 @@ class Nonogram {
                         if $expect_next eq '#' {
                             @chunks[0]--;
                             if @chunks[0] == 0 {
+                                @chunks.shift;
                                 $expect_next = ' ';
                             }
                         } else {
@@ -173,6 +174,9 @@ class Nonogram {
                             $expect_next = ' ';
                         } elsif ($t.seen.{' '} // 0) == $max - [+] @chunks {
                             $expect_next = '#';
+                        } elsif @chunks[0] == 0 {
+                            @chunks.shift;
+                            $expect_next = ' ';
                         } else {
                             last;
                         }

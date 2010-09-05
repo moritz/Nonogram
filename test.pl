@@ -13,3 +13,5 @@ $n.solve-one();
 say $n;
 $n.solve-shift();
 say $n;
+$n.solve-shift();
+say $n;
