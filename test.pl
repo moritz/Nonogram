@@ -8,5 +8,6 @@ my $n = Nonogram.new(
     rowspec => ([], [4], [6], [2, 2], [2, 2], [6], [4], [2], [2], [2], []),
 );
 
-print $n;
-
+say $n;
+$n.solve();
+say $n;

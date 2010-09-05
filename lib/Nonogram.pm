@@ -49,7 +49,7 @@ method Str {
             @result.push: '0';
         }
         @result.push: '|';
-        @result.push: @.field-rows[$row-num].join();
+        @result.push: @!field-rows[$row-num].join();
         @result.push: "|\n";
     }
     sep-line();
@@ -57,5 +57,24 @@ method Str {
     @result.join;
 }
 
+method solve() {
+    # trivial cases first
+    $.solve-zero();
+}
+
+method solve-zero() {
+    for @.colspec.kv -> $k, $v {
+        if $v.elems == 0 {
+            for @!field-rows {
+                .[$k] = ' ';
+            }
+        }
+    }
+    for @.rowspec.kv -> $idx, $row {
+        if $row.elems == 0 {
+            @!field-rows.[$idx][*] = ' ' xx *;
+        }
+    }
+}
 
 # vim: ft=perl6
