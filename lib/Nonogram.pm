@@ -82,11 +82,21 @@ method solve-one() {
     for @.colspec.kv -> $idx, $col {
         next unless $col.elems == 1;
         my $c = $col[0];
-        my $overlaps =  2 * $c - @.rowspec;
+        my $overlaps =  2 * $c - @!rowspec;
         if $overlaps > 0 {
-            my $lower = @.rowspec - $c;
+            my $lower = @!rowspec - $c;
             my $upper = $lower + $overlaps - 1;
             @!field-rows[$_][$idx] = '#' for $lower..$upper;
+        }
+    }
+    for @.rowspec.kv -> $idx, $row {
+        next unless $row.elems == 1;
+        my $r = $row[0];
+        my $overlaps = 2 * $r - @!colspec;
+        if $overlaps > 0 {
+            my $lower = @!colspec - $r;
+            my $upper = $lower + $overlaps - 1;
+            @!field-rows[$idx][$lower..$upper] = '#' xx $overlaps;
         }
     }
 
