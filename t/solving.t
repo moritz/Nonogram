@@ -14,7 +14,8 @@ my $n = Nonogram.new(
 lives_ok { $n.solve() }, 'can run .solve';
 
 # note: traling spaces here must be preserved!
-my $solved = q[ 
+my $solved =
+q[       
  ?????? 
  ###### 
  ## ??? 
