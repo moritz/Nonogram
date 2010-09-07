@@ -27,10 +27,14 @@ class Turtle {
     }
 }
 class Nonogram {
+    my $UNKNOWN = '0';
+    my $SPACE   = '1';
+    my $BOX     = '2';
+
     has @.colspec;
     has @.rowspec;
 
-    has @.field-rows = @.rowspec.map: { [ '?' xx @.colspec ] };
+    has @.field-rows = @.rowspec.map: { [ $UNKNOWN xx @.colspec ] };
 
     method max-colspec-elems {
         [max] @.colspec>>.elems;
@@ -43,6 +47,13 @@ class Nonogram {
     method Str {
         my $max-c = $.max-colspec-elems;
         my $max-r = $.max-rowspec-elems;
+
+        my %print = (
+            $SPACE   => ' ',
+            $BOX     => '#',
+            $UNKNOWN => '.',
+        );
+
         my @result;
         sub sep-line {
             @result.push: '-' x $max-r;
@@ -52,7 +63,7 @@ class Nonogram {
         }
         # header rows
         for ^$max-c -> $row-num {
-            @result.push: '#' x $max-r;
+            @result.push: ' ' x $max-r;
             @result.push: '|';
             for @.colspec -> $c {
                 my $i = $row-num + $c.elems - $max-c;
@@ -76,7 +87,7 @@ class Nonogram {
                 @result.push: '0';
             }
             @result.push: '|';
-            @result.push: @!field-rows[$row-num].join();
+            @result.push: %print{@!field-rows[$row-num]}.join();
             @result.push: "|\n";
         }
         sep-line();
@@ -95,13 +106,13 @@ class Nonogram {
         for @.colspec.kv -> $idx, $col {
             if $col.elems == 0 {
                 for @!field-rows {
-                    .[$idx] = ' ';
+                    .[$idx] = $SPACE;
                 }
             }
         }
         for @.rowspec.kv -> $idx, $row {
             if $row.elems == 0 {
-                @!field-rows.[$idx][*] = ' ' xx *;
+                @!field-rows.[$idx][*] = $SPACE xx *;
             }
         }
     }
@@ -114,7 +125,7 @@ class Nonogram {
             if $overlaps > 0 {
                 my $lower = @!rowspec - $c;
                 my $upper = $lower + $overlaps - 1;
-                @!field-rows[$_][$idx] = '#' for $lower..$upper;
+                @!field-rows[$_][$idx] = $BOX for $lower..$upper;
             }
         }
         for @.rowspec.kv -> $idx, $row {
@@ -124,7 +135,7 @@ class Nonogram {
             if $overlaps > 0 {
                 my $lower = @!colspec - $r;
                 my $upper = $lower + $overlaps - 1;
-                @!field-rows[$idx][$lower..$upper] = '#' xx $overlaps;
+                @!field-rows[$idx][$lower..$upper] = $BOX xx $overlaps;
             }
         }
     }
@@ -152,31 +163,31 @@ class Nonogram {
                 until $t.finished {
                     if $expect_next.chars {
                         @!field-rows[$t.y][$t.x] = $expect_next;
-                        if $expect_next eq '#' {
+                        if $expect_next eq $BOX {
                             @chunks[0]--;
                             if @chunks[0] == 0 {
                                 @chunks.shift;
-                                $expect_next = ' ';
+                                $expect_next = $SPACE;
                             }
                         } else {
                             $expect_next = '';
                         }
                         $t.step;
-                    } elsif $t.current eq ' ' {
+                    } elsif $t.current eq $SPACE {
                         $expect_next = '';
                         $t.step;
-                    } elsif $t.current eq '#' {
-                        $expect_next = '#';
+                    } elsif $t.current eq $BOX {
+                        $expect_next = $BOX;
                         @chunks[0]--;
                         $t.step;
                     } else {
-                        if  ($t.seen<#> // 0) == [+] @chunks {
-                            $expect_next = ' ';
-                        } elsif ($t.seen.{' '} // 0) == $max - [+] @chunks {
-                            $expect_next = '#';
+                        if  ($t.seen{$BOX} // 0) == [+] @chunks {
+                            $expect_next = $SPACE;
+                        } elsif ($t.seen.{$SPACE} // 0) == $max - [+] @chunks {
+                            $expect_next = $BOX;
                         } elsif @chunks[0] == 0 {
                             @chunks.shift;
-                            $expect_next = ' ';
+                            $expect_next = $SPACE;
                         } else {
                             last;
                         }
@@ -184,6 +195,13 @@ class Nonogram {
                 }
             }
         }
+    }
+
+    method solve-gen() {
+        for @.rowspec -> @chunks {
+
+        }
+
     }
 
 }
