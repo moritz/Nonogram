@@ -27,6 +27,8 @@ class Turtle {
     }
 }
 class Nonogram {
+    # UNKNOWN, SPACE and BOX need the following properties:
+    # SPACE ~& $BOX eq $UNKNOWN
     my $UNKNOWN = '0';
     my $SPACE   = '1';
     my $BOX     = '2';
@@ -100,6 +102,7 @@ class Nonogram {
         $.solve-zero();
         $.solve-one();
         $.solve-shift();
+        $.solve-gen();
     }
 
     method solve-zero() {
@@ -215,8 +218,8 @@ class Nonogram {
                     $str ~|= $current;
                 }
             }
-            for $str.comb(/$SPACE|$BOX/).kv -> $k, $v {
-                @.field-rows[$row-num][$k] = $v;
+            for $str.comb(/$SPACE|$BOX/, :match) -> $v {
+                @.field-rows[$row-num][$v.from] = ~$v;
             }
 
             sub distribute($total, $cells) {
@@ -225,11 +228,8 @@ class Nonogram {
                     take [$c, $_.flat] for distribute($total - $c, $cells - 1);
                 }
             }
-
         }
-
     }
-
 }
 
 # vim: ft=perl6
