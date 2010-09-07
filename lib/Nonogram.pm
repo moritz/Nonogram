@@ -201,31 +201,42 @@ class Nonogram {
     }
 
     method solve-gen() {
-        my $total = @.colspec.elems;
-        for @.rowspec.kv -> $row-num, @chunks {
-            my @boxes = $BOX Xx @chunks;
-            my $template = @.field-rows[$row-num].join;
-            next unless $template.index($UNKNOWN).defined;
+        for <h v> -> $direction {
+            my $total =  $direction eq 'h'
+                         ?? @.colspec.elems
+                         !! @.rowspec.elems;
+            my @specs := $direction eq 'h' ?? @!rowspec !! @!colspec;
+            for @specs.kv -> $idx, @chunks {
+                my @boxes = $BOX Xx @chunks;
+                my $template = $direction eq 'h'
+                               ?? @.field-rows[$idx].join
+                               !! @.field-rows>>.[$idx].join;
+                next unless $template.index($UNKNOWN).defined;
 
-            my $spaces-to-distribute = $total - ([+] @chunks) - @chunks + 1;
-            my $str = $UNKNOWN x $total;
-            for distribute($spaces-to-distribute, @chunks.elems + 1) -> $c {
-                my @a := $c;
-                @a[1..(@a-2)]>>++;
-                my $current = join '', (($SPACE Xx @a) Z @boxes),
-                                        $SPACE x @a[*-1];
-                if ($current ~& $template) eq $template {
-                    $str ~|= $current;
+                my $spaces-to-distribute = $total - ([+] @chunks) - @chunks + 1;
+                my $str = $UNKNOWN x $total;
+                for distribute($spaces-to-distribute, @chunks.elems + 1) -> $c {
+                    my @a := $c;
+                    @a[1..(@a-2)]>>++;
+                    my $current = join '', (($SPACE Xx @a) Z @boxes),
+                                            $SPACE x @a[*-1];
+                    if ($current ~& $template) eq $template {
+                        $str ~|= $current;
+                    }
                 }
-            }
-            for $str.comb(/$SPACE|$BOX/, :match) -> $v {
-                @.field-rows[$row-num][$v.from] = ~$v;
-            }
+                for $str.comb(/$SPACE|$BOX/, :match) -> $v {
+                    if $direction eq 'h' {
+                        @.field-rows[$idx][$v.from] = ~$v;
+                    } else {
+                        @.field-rows[$v.from][$idx] = ~$v;
+                    }
+                }
 
-            sub distribute($total, $cells) {
-                return [$total] if $cells == 1;
-                gather for 0..$total -> $c {
-                    take [$c, $_.flat] for distribute($total - $c, $cells - 1);
+                sub distribute($total, $cells) {
+                    return [$total] if $cells == 1;
+                    gather for 0..$total -> $c {
+                        take [$c, $_.flat] for distribute($total - $c, $cells - 1);
+                    }
                 }
             }
         }
