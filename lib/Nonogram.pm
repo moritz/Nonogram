@@ -198,7 +198,33 @@ class Nonogram {
     }
 
     method solve-gen() {
-        for @.rowspec -> @chunks {
+        my $total = @.colspec.elems;
+        for @.rowspec.kv -> $row-num, @chunks {
+            my @boxes = $BOX Xx @chunks;
+            my $template = @.field-rows[$row-num].join;
+            next unless $template.index($UNKNOWN).defined;
+
+            my $spaces-to-distribute = $total - ([+] @chunks) - @chunks + 1;
+            my $str = $UNKNOWN x $total;
+            for distribute($spaces-to-distribute, @chunks.elems + 1) -> $c {
+                my @a := $c;
+                @a[1..(@a-2)]>>++;
+                my $current = join '', (($SPACE Xx @a) Z @boxes),
+                                        $SPACE x @a[*-1];
+                if ($current ~& $template) eq $template {
+                    $str ~|= $current;
+                }
+            }
+            for $str.comb(/$SPACE|$BOX/).kv -> $k, $v {
+                @.field-rows[$row-num][$k] = $v;
+            }
+
+            sub distribute($total, $cells) {
+                return [$total] if $cells == 1;
+                gather for 0..$total -> $c {
+                    take [$c, $_.flat] for distribute($total - $c, $cells - 1);
+                }
+            }
 
         }
 
