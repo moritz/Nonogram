@@ -13,19 +13,19 @@ my $n = Nonogram.new(
 
 lives_ok { $n.solve() }, 'can run .solve';
 
-my $solved =
-q[1111111|
-10000001|
+my $solved = q[
+11111111|
+12222111|
 12222221|
-12210001|
-12210001|
+12211221|
+12211221|
 12222221|
 12222111|
 12211111|
 12211111|
-10000001|
+12211111|
 11111111|];
-for $solved.split("\n").kv -> $j,  $line {
+for $solved.trim.split("\n").kv -> $j,  $line {
     my $i = 0;
     for $line.comb -> $c {
         if $c eq any <1 2> {

@@ -201,6 +201,12 @@ class Nonogram {
     }
 
     method solve-gen() {
+        sub distribute($total, $cells) {
+            return [$total] if $cells == 1;
+            gather for 0..$total -> $c {
+                take [$c, $_.flat] for distribute($total - $c, $cells - 1);
+            }
+        }
         for <h v> -> $direction {
             my $total =  $direction eq 'h'
                          ?? @.colspec.elems
@@ -229,13 +235,6 @@ class Nonogram {
                         @.field-rows[$idx][$v.from] = ~$v;
                     } else {
                         @.field-rows[$v.from][$idx] = ~$v;
-                    }
-                }
-
-                sub distribute($total, $cells) {
-                    return [$total] if $cells == 1;
-                    gather for 0..$total -> $c {
-                        take [$c, $_.flat] for distribute($total - $c, $cells - 1);
                     }
                 }
             }
