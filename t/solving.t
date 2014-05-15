@@ -11,6 +11,8 @@ my $n = Nonogram.new(
     rowspec => ([], [4], [6], [2, 2], [2, 2], [6], [4], [2], [2], [2], []),
 );
 
+$n.solve();
+
 lives_ok { $n.solve() }, 'can run .solve';
 
 my $solved = q[
@@ -34,4 +36,4 @@ for $solved.trim.split("\n").kv -> $j,  $line {
         $i++;
     }
 }
-done_testing;
+done;

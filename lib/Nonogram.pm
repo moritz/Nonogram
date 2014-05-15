@@ -1,22 +1,23 @@
 class Turtle {
-    has @rows;
+    has @.rows;
     has $.x = 0;
     has $.y = 0;
-    has ($.dx, $.dy) = (0, 1);
+    has $.dx = 0;
+    has $.dy = 1;
     has %.seen;
 
     has $.finished = False;
     method step {
         $!x += $!dx;
         $!y += $!dy;
-        $!finished = not ($!x ~~ 0..@rows[0].end) && ($!y ~~ 0..@rows.end);
+        $!finished = not ($!x ~~ 0..@.rows[0].end) && ($!y ~~ 0..@.rows.end);
     }
     method direction($d, $idx) {
         %!seen{$.current}++;
         given $d {
-            when 'left'  { $!dx = -1; $!dy =  0; $!x = @rows[0].end; $!y = $idx };
+            when 'left'  { $!dx = -1; $!dy =  0; $!x = @.rows[0].end; $!y = $idx };
             when 'right' { $!dx = 1;  $!dy =  0; $!x = 0;            $!y = $idx };
-            when 'up'    { $!dx = 0;  $!dy = -1; $!x = $idx; $!y = @rows.end    };
+            when 'up'    { $!dx = 0;  $!dy = -1; $!x = $idx; $!y = @.rows.end    };
             when 'down'  { $!dx = 0,  $!dy =  1; $!x = $idx; $!y = 0            };
             default { die "unknown direction '$d' (should be any <left right up down>)" };
         }
@@ -36,7 +37,11 @@ class Nonogram {
     has @.colspec;
     has @.rowspec;
 
-    has @.field-rows = @.rowspec.map: { [ $UNKNOWN xx @.colspec ] };
+    has @.field-rows;
+
+    submethod BUILD(:@!colspec, :@!rowspec){
+        @!field-rows =  @!rowspec.map: { [ $UNKNOWN xx @!colspec ] };
+    }
 
     method max-colspec-elems {
         [max] @.colspec>>.elems;
@@ -154,11 +159,9 @@ class Nonogram {
             for @spec.kv -> $idx, @chunks is copy {
                 next unless @chunks;
                 my $expect_next = '';
-
                 my $max =  $direction eq (any <left right>)
                             ?? @!colspec.elems
                             !! @!rowspec.elems;
-
                 my $t = Turtle.new(
                     rows => @!field-rows,
                 );
@@ -216,7 +219,7 @@ class Nonogram {
                 my @boxes = $BOX Xx @chunks;
                 my $template = $direction eq 'h'
                                ?? @.field-rows[$idx].join
-                               !! @.field-rows>>.[$idx].join;
+                               !! (.[$idx] for @.field-rows).join;
                 next unless $template.index($UNKNOWN).defined;
 
                 my $spaces-to-distribute = $total - ([+] @chunks) - @chunks + 1;
