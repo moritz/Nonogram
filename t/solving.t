@@ -34,4 +34,4 @@ for $solved.trim.split("\n").kv -> $j,  $line {
         $i++;
     }
 }
-done_testing;
+done;
