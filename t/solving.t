@@ -2,7 +2,7 @@ use v6;
 use Test;
 plan *;
 
-BEGIN { @*INC.push('lib') }
+use lib 'lib';
 
 use Nonogram;
 
