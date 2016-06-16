@@ -11,7 +11,7 @@ my $n = Nonogram.new(
     rowspec => ([], [4], [6], [2, 2], [2, 2], [6], [4], [2], [2], [2], []),
 );
 
-lives_ok { $n.solve() }, 'can run .solve';
+lives-ok { $n.solve() }, 'can run .solve';
 
 my $solved = q[
 11111111|
